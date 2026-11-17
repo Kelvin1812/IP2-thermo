@@ -15,7 +15,7 @@ Als startopdracht modelleren we twee fietsers. Doorloop de bovenstaande drie sta
 
 
 
-## Numerieke modellen (test)
+## Numerieke modellen
 Om een simulatie te maken, splitsen we het volledige proces op in kleine stappen met een vaste (tijd)interval, zoals in onderstaande figuur. Elk stapje krijgt een nummer, van $0$ tot $N$. We gebruiken de letter $i$ om naar een specifieke stap te verwijzen.
 
 De gegevens in stap $i$ worden gebruikt om de waarden in stap $i+1$ te berekenen, bijvoorbeeld:
@@ -36,8 +36,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Beginwaarden
-dt = 0.25                  #s
-t_e = 10                   #s
+dt = 0.5                  #s
+t_e = 10                  #s
 N = int(t_e/dt)+1
 t = np.arange(0,t_e+dt,dt) #s
 
@@ -81,7 +81,7 @@ Maak het tijdsinterval $dt$ groter en vergelijk de afgelegde weg in de tien seco
 <!-- Jouw antwoord hier  -->
 
 ```python
-%reset -f  #clears memory as we don't need it further down 
+%reset -f 
 ```
 
 ## Naar een deeltjesmodel
@@ -121,6 +121,7 @@ $$ x_{n+1}=x_n + v\cdot\Delta t $$
 Laten we nu een ook echt een deeltje creëren en kijken wat we ermee kunnen doen.
 
 ```python
+import numpy as np
 # een enkel deeltje:
 this_particle = ParticleClass(m=1.0, v=[5.0, 0], r=[0.0, 0.0], R=1.0)
 print(this_particle)
@@ -229,7 +230,18 @@ En als je wilt gaan voor een uitdaging:
 ```
 
 ```python
-### YOUR CODE HERE ###
+particles = []
+for x in range(10):
+    particles.append(ParticleClass(m=1.0, v=[np.random.uniform(-5,5), np.random.uniform(-1,1)], r=[x, 0.0],R=1.0))
+
+
+plt.figure()
+
+for particle in particles:
+    plt.plot(particle.r[0], particle.r[1], 'r.')
+    particle.update_position(1.0)
+    plt.plot(particle.r[0], particle.r[1], 'k.')
+plt.show()
 ```
 
 Onze simulaties worden snel “zwaar”. Er moeten veel berekeningen gedaan worden en dat kost nu eenmaal tijd. Nu is het wel zo dat sommige berekeningen meer tijd kosten dan anderen. Om te kijken of een stukje code geoptimaliseerd kan worden, moeten we een timer maken. Dat kan met onderstaande code:
@@ -250,6 +262,17 @@ eind = time.time()
 lengte = eind - start
 
 print("Dit kostte ", lengte, "seconde!")
+
+# andere manier
+start_1 = time.time()
+
+N = int(1e5)
+array = np.random.rand(N)
+
+eind_1 = time.time()
+lengte_1 = eind_1 - start_1
+
+print("Dit kostte ", lengte_1, "seconde!")
 ```
 
 Idealiter draaien we de bovenstaande code een aantal keer zodat we een goede schatting hebben van de rekentijd.
@@ -272,7 +295,7 @@ De runtime is {eval}`<naam variabele>` korter.
 ```
 
 ```python
-
+print('De runtime is', lengte-lengte_1, 'secondes korter')
 ```
 
 ## Aan de slag met deeltjes
@@ -407,6 +430,8 @@ def init():
 def update(frame):
     particle.update_position()
     dot.set_data([particle.r[0]], [particle.r[1]])
+    if particle.r[0] <= -10 or particle.r[0] >= 10:
+        particle.v = -particle.v
     return dot,
 
 # Create animation
@@ -432,7 +457,10 @@ Controleer je eigen antwoord door de functie hierboven even te vervangen door de
 def update(frame):
     particle.update_position()
     dot.set_data([particle.r[0]], [particle.r[1]])
-### YOUR CODE HERE ###
+    if particle.r[0] < -10:
+        particle.r[0] = particle.r[0]+20
+    if particle.r[0] > 10:
+        particle.r[0] = particle.r[0]-20
     return dot,         
 ```
 
@@ -448,7 +476,8 @@ Test wederom je code door de vernieuwde functie hierboven te plakken.
 def update(frame):
     particle.update_position()
     dot.set_data([particle.r[0]], [particle.r[1]])
-### YOUR CODE HERE ###
+    if particle.r[0] <= -10 or particle.r[0] >= 10:
+        particle.v = -particle.v
     return dot,
 ```
 
@@ -463,7 +492,7 @@ Verander nu de code zodanig dat de beginsnelheid gegeven wordt door $\vec{v}=5\h
 dt = 0.1         # time step
 num_steps = 500  # number of time steps
 
-### YOUR CODE HERE ###
+particle = ParticleClass(m=1.0, v=[5.0, 3.0], r=[0.0, 0.0],R=1.0)  
 
 # Create the figure and axis
 fig, ax = plt.subplots()
@@ -486,7 +515,10 @@ def init():
 def update(frame):
     particle.update_position()
     dot.set_data([particle.r[0]], [particle.r[1]])
-    ### YOUR CODE HERE ###
+    if particle.r[0] <= -10 or particle.r[0] >= 10:
+        particle.v[0] = -particle.v[0]
+    if particle.r[1] <= -10 or particle.r[1] >= 10:
+        particle.v[1] = -particle.v[1]
     return dot,
 
 # Create animation
