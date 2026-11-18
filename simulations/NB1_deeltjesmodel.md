@@ -229,7 +229,33 @@ En als je wilt gaan voor een uitdaging:
 ```
 
 ```python
-### YOUR CODE HERE ###
+#opdracht 4
+import matplotlib.pyplot as plt
+dt=1 #kennelijk was dt vooraf niet aangeduid
+arraydeeltjes = []
+plt.figure()
+for i in range (10): #we gaan tien deeltjes maken met ieder een andere positie en random snelheid
+    dt=1
+    positie = [i,0.0] #steeds een andere positie
+    snelheid = [np.random.randint(-6,5),0] #willekeurige snelheid tussen -5,5, incl 0
+    deeltje = ParticleClass(m=1,v=snelheid,r=positie,R=1.0) #deeltje opstellen
+    arraydeeltjes.append(deeltje) #toevoegen aan de lijst met deeltjes
+    kleur = ['red','blue','green','purple','orange','magenta','cyan','brown','gold','navy']
+    deeltje.zijn_kleur=kleur[i] #deeltjes een unieke kleur toekennen
+    plt.plot(deeltje.r[0],deeltje.r[1],marker='o',color=kleur[i]) #deeltjes plotten op t = 0
+plt.title("Startpositities deeltjes")
+for deeltje in arraydeeltjes:
+    deeltje.update_position(dt) #positie updaten deeltje
+    
+plt.figure()
+for deeltje in arraydeeltjes: #positie van de geupdate deeltjes plotten
+    plt.plot(deeltje.r[0],deeltje.r[1],marker='o',color=deeltje.zijn_kleur)
+plt.title("Geupdate positie deeltjes")
+plt.xlabel('x(m)')
+plt.xticks(np.arange(-6,14,1))
+plt.ylabel('y(m)')
+plt.show()
+
 ```
 
 Onze simulaties worden snel “zwaar”. Er moeten veel berekeningen gedaan worden en dat kost nu eenmaal tijd. Nu is het wel zo dat sommige berekeningen meer tijd kosten dan anderen. Om te kijken of een stukje code geoptimaliseerd kan worden, moeten we een timer maken. Dat kan met onderstaande code:
@@ -268,7 +294,7 @@ Met de MyST extentie in jupyterlab kun je gebruik maken van [eval](https://mystm
 ```
 
 ```{solution} ex-intro-3
-De runtime is {eval}`<naam variabele>` korter.
+De runtime is 2331 keer korter.
 ```
 
 ```python
