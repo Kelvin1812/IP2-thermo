@@ -560,12 +560,30 @@ class ParticleClass:
 
 
 ```python
+class ParticleClass:
+    def __init__(self, m, v, r, R):
+        self.m = m                         # mass of the particle
+        self.v = np.array(v, dtype=float)  # velocity vector
+        self.r = np.array(r, dtype=float)  # position vector
+        self.R = R                         # radius of the particle
+
+    def update_position(self):
+        self.r += self.v * dt
+    
+    def update_velocity(self, a):
+        self.v += a*dt
+```
+
+```python
 
 # Simulation parameters
 dt = 0.1         # time step
 num_steps = 500  # number of time steps
-particle = ParticleClass(m=1.0, v=[5.0, 0], r=[0.0, 0.0],R=1.0)  
-### YOUR CODE HERE ###
+particle = ParticleClass(m=1.0, v=[5.0, 0], r=[0.0, 0.0],R=1.0, )  
+a = np.array([0,-9.81])
+
+
+
 # Create the figure and axis
 fig, ax = plt.subplots()
 ax.set_xlim(-10, 10)
@@ -587,10 +605,13 @@ def init():
 def update(frame):
     particle.update_velocity(a)
     particle.update_position()
-    
     dot.set_data([particle.r[0]], [particle.r[1]])
-    ### YOUR CODE HERE ###
+    if particle.r[0] <= -10 or particle.r[0] >= 10:
+        particle.v[0] = -particle.v[0]
+    if particle.r[1] <= -10 or particle.r[1] >= 10:
+        particle.v[1] = -particle.v[1]
     return dot,
+
 
 # Create animation
 ani = FuncAnimation(fig, update, frames=range(200), init_func=init, blit=True, interval=50)
@@ -609,7 +630,7 @@ Herinner wat we in Q1 hebben gedaan bij de basics van een numerieke simulatie...
 ```
 
 ```{solution} ex-deeltjesmodel-6
-Jouw antwoord hier...
+De energie lijkt niet behouden, dit zou kunnen komen door de stap grote met bijvoorbeele de botsingen van de wand waardoor er snelheid verloren gaat in de stappen er er steeds minder energie over blijf.t
 ```
 
 Een optie om de simulatie te verbeteren is de tijdstap $\Delta t$ kleiner te maken, maar dan hebben we ook meer geduld meer nodig - het aantal berekeningen schaalt met $\frac{1}{\Delta t}$. Een tweede optie is een meer directe oplossing: We weten dat $a = \mathrm{const.}$ en daarom weten we ook de bewegingsvergelijking van het deeltje!
@@ -696,7 +717,7 @@ Maak de code hieronder voor twee deeltjes die bewegen in een afgesloten doos. Be
 dt = 0.1         # time step
 num_steps = 500  # number of time steps
 particleA = ParticleClass(m=1.0, v=[0, 0], r=[0.0, 0.0],R=1.0)  
-### YOUR CODE HERE ###
+particleB = ParticleClass(m=1.0, v=[5.0, 0], r=[0.0, 0.0],R=1.0)
 
 track_x = []
 track_y = []
@@ -725,7 +746,8 @@ def update(frame):
     particleA.update_position()
     particleA.update_velocity(a)
 
-### YOUR CODE HERE ###
+    particleB.update_position()
+    particleB.update_velocity(a)
 
     track_x.append(particleA.r[0])
     track_y.append(particleA.r[1])
@@ -771,7 +793,7 @@ Nu je een beetje weet hoe een numeriek model werkt, hoe je boundaries kunt opgev
 ```
 
 ```{solution} ex-deeltjes_10
-Jouw antwoord.
+1. Dat $|r_1-r_2| = 2R$
 ```
 
 ```python tags=["NB1_botsingsvoorwaarde"]
@@ -789,8 +811,7 @@ class ParticleClass:
         self.r += self.v * dt  
 
     def collide_detection(self, other):
-        ### YOUR CODE HERE ###
-        return  dx**2+dy**2 < rr**2 
+        return  (self.r[0]-other.r[0])**2+(self.r[1]-other.r[1])**2 < 0.9**2 
 ```
 
 ```python
@@ -841,7 +862,8 @@ def update(frame):
 
     # botsing tussen de deeltjes onderling
     if particleA.collide_detection(particleB):
-        ### YOUR CODE HERE ###
+        particleA.v = particleA.v*-1
+        particleB.v = particleA.v*-1
 
 
     # botsing met de wand
